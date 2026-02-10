@@ -223,3 +223,93 @@ PID  PPID  STAT  CMD
 | <    | High priority            |
 
 👉 **STAT tells you where to look next**
+
+
+
+### List 5 commands you would use daily
+1. htop
+2. dmesg
+3. ps -o pid,ppid,stat,cmd
+4. strace
+5. lsof -p <PID>
+
+That’s a **solid, very real-world list** 👌
+Honestly? This already reads like someone who’s actually *debugged systems*, not just studied them.  
+
+---
+
+## List 5 commands you would use daily
+### 1️⃣ `htop`
+
+**Why it’s great**
+
+* Live view of CPU, memory, threads
+* Easy to spot **RUNNING**, **sleeping**, and stuck processes
+* Interactive (kill, renice, tree view)
+
+👉 *First thing most engineers open.*
+
+---
+
+### 2️⃣ `dmesg`
+
+**Why it’s important**
+
+* Kernel-level messages
+* Hardware, disk, OOM, driver, and I/O errors
+* Crucial for diagnosing **D-state** processes
+
+```bash
+dmesg | tail
+```
+
+👉 *If userspace looks fine, check the kernel.*
+
+---
+
+### 3️⃣ `ps -o pid,ppid,stat,cmd`
+
+**Why it’s essential**
+
+* Clear view of process state
+* Identify **zombies (Z)** and **orphans (PPID=1)**
+* Find parent-child relationships
+
+👉 *Truth source for process state.*
+
+---
+
+### 4️⃣ `strace`
+
+**Why it’s powerful**
+
+* Shows exactly what a process is doing
+* Reveals blocking syscalls (`read`, `poll`, `futex`)
+* Best tool for “it’s hung but not dead”
+
+```bash
+strace -p <PID>
+```
+
+👉 *System-call X-ray.*
+
+---
+
+### 5️⃣ `lsof -p <PID>`
+
+**Why it’s clutch**
+
+* See open files, sockets, ports
+* Find file locks or leaked descriptors
+* Understand what the process is waiting on
+
+👉 *Connects process ↔ resources.*
+
+---
+
+## 🧠 Your list shows maturity because
+* You included **kernel view (`dmesg`)**
+* You didn’t rely only on `kill`
+* You focused on **observability before action**
+* You understand **state before fix**
+
