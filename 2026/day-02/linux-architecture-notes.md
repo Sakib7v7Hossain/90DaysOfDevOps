@@ -88,3 +88,138 @@ Simply a manager who manages processes. systemd is not creator of processes caus
 
 ### Explain process states (running, sleeping, zombie, etc.)
 This is interesting topic. You created processes are there managing by the manager now you also need to know that should you need to take any action or just leave as it is? Let's find it out.
+```
+1. Types of processes states
+2. When it arises
+3. How to detect that it occurs
+4. How to fix / respond
+```
+1. Types of processes states
+   *  Running 
+   *  Sleeping - Interruptible
+   *  Sleeping - Unterrruptible
+   *  Stopped
+   *  Zombie
+   *  IDLE
+   *  WAKEKILL - being killed
+   *  Walking - Transitioning
+   *  Parked - Kernel parking
+   *  Orphan
+
+
+# Process States and Troubleshooting
+
+After a process is created, it doesn’t just run and disappear. It moves through multiple states, each telling us what’s happening with its PID and execution.
+
+---
+
+## Common Process States
+
+### 1️⃣ Created (Birth Certificate Issued)
+
+* OS creates the process
+* PID is assigned
+* Process is not scheduled yet
+
+⬇️
+
+### 2️⃣ Ready (Waiting for CPU)
+
+* Process is fully prepared
+* Waiting for CPU scheduling
+* PID exists, not running
+
+⬇️
+
+### 3️⃣ Running (Actual Work Begins)
+
+* Process is executing on the CPU
+* Instructions are being executed
+
+⬇️
+
+### 4️⃣ From Running, a process can:
+
+* Move to **Waiting** (for I/O or event)
+* Call `exit()` → become **Zombie**
+* Be preempted → go back to **Ready**
+
+⬇️
+
+### 5️⃣ Waiting / Blocked
+
+* Process is alive
+* Waiting for I/O, signal, or event
+* PID is active, but process is not running
+
+⬇️
+
+### 6️⃣ From Waiting, it can:
+
+* Return to **Ready** (when event completes)
+* Become an **Orphan** (if parent dies)
+
+---
+
+## ⚠️ Dangerous / Confusing States
+
+### 🧟 Zombie Process
+
+* Process has finished execution
+* Memory is released
+* PID still exists
+* Waiting for parent to collect exit status (`wait()`)
+
+**👉 Dead process, unfinished paperwork.**
+
+---
+
+### 👶 Orphan Process
+
+* Parent process has terminated
+* Child process is still running
+* PID is active
+* Adopted by `init/systemd`
+
+**👉 Parent is gone, child continues normally.**
+
+---
+
+## 🧠 Key Takeaway
+
+* PID exists ≠ process is running
+* Zombie → dead but listed
+* Orphan → alive but parentless
+* Process is truly gone only when its PID is removed
+
+---
+
+## Identify the Process & Its State
+
+*(Let’s see who has the problem)*
+
+```bash
+ps -o pid,ppid,stat,cmd -p <PID>
+```
+
+### Example Output
+
+```text
+PID  PPID  STAT  CMD
+811  800   Z     nginx
+```
+
+---
+
+## Process State Codes
+
+| Code | Meaning                  |
+| ---- | ------------------------ |
+| R    | Running                  |
+| S    | Sleeping (Waiting)       |
+| D    | Uninterruptible I/O wait |
+| Z    | Zombie                   |
+| T    | Stopped                  |
+| <    | High priority            |
+
+👉 **STAT tells you where to look next**
